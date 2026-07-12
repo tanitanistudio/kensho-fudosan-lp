@@ -490,12 +490,13 @@ async function fetchSheetProps(){
   const rows = parseCSV(await res.text()).filter(r=>r.length>1);
   const header = (rows[0]||[]).map(h=>h.trim());
   const idx = name => header.indexOf(name);
-  const iNo=idx('No.'), iName=idx('タイトル'), iLoc=idx('住所'), iImg=idx('画像URL'), iVis=idx('公開/未公開'), iLayout=idx('間取り'), iArea=idx('土地面積'), iPrice=idx('金額');
+  const iNo=idx('No.'), iName=idx('タイトル'), iLoc=idx('住所'), iImg=idx('画像URL'), iVis=idx('公開/未公開'), iLayout=idx('間取り'), iArea=idx('土地面積'), iPrice=idx('金額'), iStatus=idx('掲載/編集中');
   const items=[];
   for(let r=1;r<rows.length;r++){
     const row=rows[r];
     const name=(row[iName]||'').trim();
     if(!name) continue;
+    if(iStatus>=0 && (row[iStatus]||'').trim()!=='掲載') continue; // 「編集中」など掲載以外はサイトに表示しない
     const area=(row[iArea]||'').trim();
     const img=(row[iImg]||'').trim();
     items.push({
