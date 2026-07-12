@@ -330,7 +330,7 @@
       <div class="rv-summary">
         <span class="rv-stars">★★★★★</span>
         <b id="rvAvg">5.0</b>
-        <span class="rv-count">Googleクチコミ <b id="rvCount">20</b>件</span>
+        <span class="rv-count">Googleクチコミ <b id="rvCount">41</b>件</span>
       </div>
       <p class="ja-sub">実際にご購入いただいたお客様から、Googleにお寄せいただいた声です。</p>
     </div>
@@ -566,21 +566,20 @@ async function loadProps(){
 async function saveProp(p){ if(hasStore){ try{ await window.storage.set('prop:'+p.id, JSON.stringify(p), false); return; }catch(e){} } memCache.push(p); }
 async function delProp(id){ if(hasStore){ try{ await window.storage.delete('prop:'+id, false); return; }catch(e){} } memCache=memCache.filter(p=>p.id!==id); }
 
-const SEED=[
-  {id:'s1',name:'小平市上水新町2丁目【新築】',price:'4,980',loc:'東京都小平市上水新町2丁目',layout:'4LDK',area:'土地110.21㎡',vis:'public',isNew:true,img:null},
-  {id:'s2',name:'小平市小川町1丁目【新築】',price:'5,480',loc:'東京都小平市小川町1丁目',layout:'4LDK',area:'土地145.71㎡',vis:'public',isNew:true,img:null},
-  {id:'s3',name:'小平市花小金井3丁目【新築】',price:'5,180',loc:'東京都小平市花小金井3丁目',layout:'4LDK',area:'土地125.10㎡',vis:'public',isNew:false,img:null},
-  {id:'s4',name:'【未公開】小平市栄町2丁目',price:'4,680',loc:'東京都小平市栄町2丁目',layout:'4LDK',area:'土地120.10㎡',vis:'member',isNew:true,img:null},
-  {id:'s5',name:'【未公開】小平市大沼町4丁目',price:'3,580',loc:'東京都小平市大沼町4丁目',layout:'3LDK',area:'建物108.48㎡',vis:'member',isNew:false,img:null},
-];
 let props=[],isMember=false,curFilter='all';
 async function init(){
   const grid=document.getElementById('propGrid');
   grid.innerHTML='<p style="grid-column:1/-1;text-align:center;color:var(--muted);padding:2rem 0;">物件情報を読み込み中...</p>';
-  let sheetProps=[];
-  try{ sheetProps = await fetchSheetProps(); }catch(e){ console.warn('物件シートの取得に失敗しました。フォールバックデータを表示します。', e); }
+  let sheetProps;
+  try{
+    sheetProps = await fetchSheetProps();
+  }catch(e){
+    console.error('物件情報の取得に失敗しました。', e);
+    grid.innerHTML='<p style="grid-column:1/-1;text-align:center;color:var(--muted);padding:2rem 0;">物件情報の読み込みに失敗しました。しばらくしてから再度お試しください。</p>';
+    return;
+  }
   const localProps=await loadProps();
-  props=(sheetProps.length?sheetProps:SEED.slice()).concat(localProps);
+  props=sheetProps.concat(localProps);
   render();
 }
 function updateCounts(){
